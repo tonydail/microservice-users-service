@@ -1,7 +1,10 @@
 {
   "name": "microservice-users-service",
-  "dockerComposeFile": "docker-compose.yml",
-  "service": "app",
+  "dockerComposeFile": [
+    "docker-compose.yml",
+    "docker-compose.devcontainer.yml"
+  ],
+  "service": "users-app",
   "workspaceFolder": "/microservice-users-service",
   "remoteUser": "node",
   "features": {
@@ -41,19 +44,6 @@
         },
         "typescript.tsdk": "node_modules/typescript/lib"
       }
-    }
-  },
-  "postStartCommand": "sudo chown -R node:node /microservice-users-service/node_modules && sudo chown -R node:node /microservice-users-service/dist && npm install &&  npm run db:migrate 2>/dev/null || true  && npm run db:seed 2>/dev/null || true",
-  "forwardPorts": [
-    3002,
-    5434
-  ],
-  "portsAttributes": {
-    "3002": {
-      "label": "microservice-users-service REST"
-    },
-    "5434": {
-      "label": "microservice-users-service Postgres"
     }
   }
 }
