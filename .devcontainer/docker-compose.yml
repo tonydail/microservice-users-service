@@ -10,7 +10,7 @@ services:
     working_dir: /microservice-users-service
     # For standalone mode: run the service
     # For devcontainer mode: this gets overridden to "sleep infinity"
-    command: sh -c "sudo chown -R node:node /microservice-users-service/node_modules /microservice-users-service/dist && npm install && npx prisma generate && npm run db:migrate && npm run db:seed || true && npm run build && npm start"
+    command: sh -c "sudo chown -R node:node /microservice-users-service/node_modules /microservice-users-service/dist && npm install && npx prisma generate && npm run db:migrate && npm run db:seed || true && npm run build && /microservice-users-service/register-outbox-connector.sh && npm start"
     env_file:
       - ../../environment/container-hosts.env
       - ../../environment/common-service-db.env
@@ -24,6 +24,13 @@ services:
     depends_on:
       users-db:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:$$USERS_APP_PORT/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+  
     networks:
       - microservices-net
     restart: unless-stopped
