@@ -17,21 +17,18 @@ services:
       sh -c "chmod +x .devcontainer/scripts/*.sh && .devcontainer/scripts/container-startup.sh standalone"
 
     env_file:
-      - ../../environment/container-hosts.env
-      - ../../environment/common-service-db.env
-      - ../../environment/microservice-users-service-db.env
-      - ../../environment/common-services-app.env
-      - ../../environment/microservice-users-service-app.env
-
-    environment:
-      - NODE_ENV=development
+      - ../../environment/common-db.env
+      - ../../environment/users-service-db.env
+      - ../../environment/common-app.env
+      - ../../environment/users-service.env
 
     depends_on:
       users-db:
         condition: service_healthy
 
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:$$users_APP_PORT/health || exit 1"]
+      test:
+        ["CMD-SHELL", "curl -f http://localhost:$$USERS_APP_PORT/health || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -44,7 +41,7 @@ services:
     image: postgres:16-alpine
     container_name: ${USERS_DB_HOST:-microservice-users-service-db}
     restart: unless-stopped
-    
+
     # Enable logical replication for Debezium CDC
     command: postgres -c wal_level=logical -c max_replication_slots=4 -c max_wal_senders=4
 
@@ -52,12 +49,10 @@ services:
       - users-db-data:/var/lib/postgresql/data
 
     env_file:
-      - ../../environment/container-hosts.env
-      - ../../environment/common-service-db.env
-      - ../../environment/microservice-users-service-db.env
-
+      - ../../environment/common-db.env
+      - ../../environment/users-service-db.env
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $$USERS_DB_USER -d $$USERS_DB_NAME"]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 5s
       timeout: 5s
       retries: 5
