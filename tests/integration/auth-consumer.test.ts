@@ -12,17 +12,23 @@ import { Kafka, EachMessagePayload } from 'kafkajs';
 import { UsersService } from '../../src/services/users.service.js';
 
 const prisma = new PrismaClient();
+const testUserIds = ['user-456', 'user-789', 'user-999'];
 
 beforeAll(async () => {
   await prisma.$connect();
 });
 
 afterAll(async () => {
+  await prisma.userProfile.deleteMany({
+    where: { userId: { in: testUserIds } },
+  });
   await prisma.$disconnect();
 });
 
 beforeEach(async () => {
-  await prisma.userProfile.deleteMany();
+  await prisma.userProfile.deleteMany({
+    where: { userId: { in: testUserIds } },
+  });
 });
 
 describe('auth.consumer - UserRegisteredEvent', () => {
