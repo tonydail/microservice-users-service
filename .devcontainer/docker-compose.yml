@@ -5,7 +5,7 @@ services:
     user: node
     working_dir: /microservice-users-service
     restart: unless-stopped
-
+    tty: true
     volumes:
       - ..:/microservice-users-service:cached
       - users-node-modules:/microservice-users-service/node_modules
