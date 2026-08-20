@@ -9,20 +9,20 @@ import { UsersService } from '../../src/services/users.service.js';
 
 const prisma = new PrismaClient();
 const usersService = new UsersService();
+const userId = 'integration-user-id';
 
 beforeAll(async () => {
   await prisma.$connect();
-  await prisma.outboxEvent.deleteMany();
-  await prisma.userProfile.deleteMany();
+  await prisma.userProfile.deleteMany({ where: { userId } });
 });
 
 afterAll(async () => {
+  await prisma.userProfile.deleteMany({ where: { userId } });
   await prisma.$disconnect();
 });
 
 describe('UsersService integration', () => {
   it('creates a profile from a Kafka event (idempotent)', async () => {
-    const userId = 'integration-user-id';
     const first = await usersService.createProfileFromEvent(userId);
     const second = await usersService.createProfileFromEvent(userId);
     expect(first.userId).toBe(userId);
