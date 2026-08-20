@@ -28,6 +28,5 @@ echo "  Users service started!"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 $COMPOSE --project-name microservice-users-service_devcontainer -f .devcontainer/docker-compose.yml ps
 
-echo ""
-echo "View logs: docker logs -f microservice-users-service-app"
-echo "Stop:      ./stop.sh"
+docker logs -f microservice-users-service-app
+

@@ -129,8 +129,10 @@ All errors flow through `AppError` class and centralized `errorHandler` middlewa
 
 2. **Ensure auth service is running** (for gRPC calls):
    ```bash
-   # Auth service should be started by start-services.sh
-   # or opened in its own Dev Container
+   # Start auth service:
+   cd microservice-auth-service
+   ./start.sh
+   # or open auth service in its own Dev Container
    ```
 
 3. **Open in VS Code**:
