@@ -107,6 +107,13 @@ if (existingProfile) {
 ### Configuration
 Only `src/config/index.ts` reads `process.env` (Zod-validated at startup). Configuration is type-safe throughout the application.
 
+Kafka consumer startup retries can be configured with:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `KAFKA_STARTUP_RETRIES` | `5` | Retries after the initial startup attempt |
+| `KAFKA_STARTUP_RETRY_DELAY_MS` | `1000` | Initial delay; subsequent retries use exponential backoff capped at 30 seconds |
+
 ### Error Handling
 All errors flow through `AppError` class and centralized `errorHandler` middleware. No stack traces in production.
 

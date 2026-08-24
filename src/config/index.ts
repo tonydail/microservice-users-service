@@ -6,6 +6,8 @@ const envSchema = z.object({
   GRPC_PORT: z.coerce.number().default(50052),
   DATABASE_URL: z.string().url(),
   KAFKA_BROKERS: z.string().default('localhost:29092'),
+  KAFKA_STARTUP_RETRIES: z.coerce.number().int().nonnegative().default(5),
+  KAFKA_STARTUP_RETRY_DELAY_MS: z.coerce.number().int().nonnegative().default(1000),
   AUTH_GRPC_HOST: z.string().default('localhost'),
   AUTH_GRPC_PORT: z.coerce.number().default(50051),
 });
