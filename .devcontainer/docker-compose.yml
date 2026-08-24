@@ -26,13 +26,6 @@ services:
       users-db:
         condition: service_healthy
 
-    healthcheck:
-      test:
-        ["CMD-SHELL", "curl -f http://localhost:$$USERS_APP_PORT/health || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
 
     networks:
       - microservices-net
