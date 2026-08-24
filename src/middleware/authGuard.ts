@@ -4,6 +4,7 @@ import { validateToken } from '../grpc/client';
 
 export interface AuthenticatedRequest extends Request {
   userId?: string;
+  userRoles?: string[];
 }
 
 export function authGuard(req: AuthenticatedRequest, _res: Response, next: NextFunction): void {
@@ -11,6 +12,14 @@ export function authGuard(req: AuthenticatedRequest, _res: Response, next: NextF
   const gatewayUserId = req.headers['x-user-id'];
   if (typeof gatewayUserId === 'string') {
     req.userId = gatewayUserId;
+  }
+
+  const gatewayRoles = req.headers['x-user-roles'];
+  if (typeof gatewayRoles === 'string') {
+    req.userRoles = gatewayRoles.split(',');
+  }
+
+  if (req.userId && req.userRoles) {
     return next();
   }
 
@@ -27,9 +36,22 @@ export function authGuard(req: AuthenticatedRequest, _res: Response, next: NextF
         return next(new AppError(401, 'Unauthorized'));
       }
       req.userId = userId;
+      req.userRoles = []; // Initialize as empty array since roles are not provided by gRPC
       next();
     })
     .catch(() => {
       next(new AppError(401, 'Unauthorized'));
     });
+}
+
+export function roleGuard(requiredRole: string) {
+  return (req: AuthenticatedRequest, _res: Response, next: NextFunction): void => {
+    const roles = req.userRoles;
+    if (Array.isArray(roles)) {
+      if (roles.includes(requiredRole)) {
+        return next();
+      }
+    }
+    return next(new AppError(403, 'Forbidden'));
+  };
 }

@@ -5,14 +5,16 @@ import { logger } from './config/logger';
 import { usersRouter } from './routes/users.routes';
 import { errorHandler } from './middleware/errorHandler';
 import { startConsumers } from './events/consumers/auth.consumer';
+import { authGuard } from './middleware/authGuard';
 
 const app = express();
 
 app.use(express.json());
 app.use(pinoHttp({ logger }));
-
+app.use(authGuard);
 app.use('/health', (_req, res) => res.json({ status: 'ok', service: 'users-service' }));
 app.use('/', usersRouter);
+
 app.use(errorHandler);
 
 app.listen(config.PORT, () => {
