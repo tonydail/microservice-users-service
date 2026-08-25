@@ -6,3 +6,4 @@ dist/
 git-scripts/
 .vscode/
 workflow-scripts/
+.actrc
