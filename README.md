@@ -261,7 +261,7 @@ PUT    /users/:id          # Update user profile
 DELETE /users/:id          # Delete user profile
 ```
 
-All endpoints require valid JWT token in `Authorization: Bearer <token>` header (validated via auth-service gRPC).
+All endpoints require valid JWT token in `Authorization: Bearer <token>` header. nginx gateway validates the token and injects `X-User-Id` and `X-User-Roles` headers.
 
 ## 🔄 Events
 
@@ -295,6 +295,30 @@ Require PostgreSQL. Tests run against a real database.
 npm run test:integration
 ```
 
+### Test Coverage
+Generate coverage reports:
+
+```bash
+npm run test:coverage
+```
+
+Coverage reports are generated in `coverage/` directory with HTML and JSON formats.
+
+### CI/CD
+Automated testing runs on:
+- Pull requests to `develop` or `main`
+- Pushes to `develop` or `main`
+
+GitHub Actions workflow includes:
+- PostgreSQL service container
+- All tests (unit + integration)
+- Coverage reporting
+
+**Local workflow testing** with `act`:
+```bash
+./run-tests-with-act.sh
+```
+
 ### Test Structure
 - `tests/unit/`: Isolated business logic tests
 - `tests/integration/`: End-to-end API tests with real database
@@ -302,18 +326,20 @@ npm run test:integration
 ## 🔗 Service Dependencies
 
 ### Runtime Dependencies
-- **Auth Service**: gRPC calls for token validation
+- **Auth Service**: Token validation via nginx gateway (auth_request)
 - **Kafka**: Event consumption and publishing
 - **PostgreSQL**: Profile data storage
 - **Debezium**: CDC for transactional outbox
 
 ### Integration Flow
 ```
-Client → nginx (validates JWT) → Users Service (port 3002)
-                                       ↓
-                                 gRPC call to Auth Service (port 50051)
-                                       ↓
-                                 Token validated → process request
+Client → nginx (validates JWT via /_auth) → Users Service (port 3002)
+                ↓
+         Auth Service /validate endpoint
+                ↓
+         Headers injected: X-User-Id, X-User-Roles
+                ↓
+         Users Service receives validated request
 ```
 
 ## 🔗 Related Repositories
